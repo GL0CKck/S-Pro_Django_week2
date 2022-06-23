@@ -1,3 +1,18 @@
 from django.db import models
 
-# Create your models here.
+
+class Author(models.Model):
+    full_name = models.CharField(max_length=127, verbose_name='Name and Surname')
+
+    def __str__(self):
+        return self.full_name
+
+
+class Book(models.Model):
+    title = models.CharField(max_length=66, verbose_name='Title')
+    author = models.ForeignKey(Author, auto_created=True, on_delete=models.CASCADE, verbose_name='Author')
+    release_data = models.DateField(verbose_name='Release Data')
+    description = models.TextField(verbose_name='Description')
+
+    def __str__(self):
+        return self.title

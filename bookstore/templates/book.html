@@ -2,9 +2,9 @@
 {% block content %}
 <div  class="media-body" >
 <p class="text-right  font-weight-bold"> Название книги - {{ book.title }} </p>
-<p class="text-right  font-italic" > Дата выпуска - {{ book.released_data }}</p>
-<p class="text-right  font-italic" > Автор - {{ book.author_name }}</p>
+<p class="text-right  font-italic" >  Автор- {{ book.author }}</p>
+<p class="text-right  font-italic" >  Дата выпуска- {{ book.release_data }}</p>
+<p class="text-right  font-italic" > Описание - {{ book.description }}</p>
         <a href="{% url 'book_list' %}">Home</a>
-        <a href="{% url 'author_detail' index=book.author_id %}">{{ book.author_name }}</a>
   </div>
 {% endblock %}

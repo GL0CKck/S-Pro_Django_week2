@@ -1,9 +1,6 @@
 {% extends 'home/base.html' %}
 {% block content %}
-    <form action="{% url 'search_book' %}" method="get">
-  <input name="q" type="text" placeholder="Search...">
-</form>
-{% for book in books %}
+{% for book in object_list %}
     <div  class="media-body" >
 <p class="text-right  font-weight-bold"> Название книги - {{ book.title }} </p>
 <p class="text-right  font-italic" > Автор- {{ book.author }}</p>
