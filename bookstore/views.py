@@ -1,7 +1,11 @@
+from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import render, redirect
-from django.views.generic import CreateView, ListView
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, ListView, DetailView
 from django.shortcuts import get_object_or_404
-from .forms import BookForm, AuthorForm
+from django.views.generic.edit import FormMixin
+
+from .forms import BookForm, AuthorForm, CommentForm
 from .models import Author, Book
 
 
@@ -39,12 +43,6 @@ def book_list(request):
     return render(request, 'all_books.html', context)
 
 
-def book_detail(request, pk):
-    book = get_object_or_404(Book, pk=pk)
-    context = {'book': book}
-    return render(request, 'book.html', context)
-
-
 class SearchBookView(ListView):
     model = Book
     template_name = 'search_book.html'
@@ -53,3 +51,27 @@ class SearchBookView(ListView):
         query = self.request.GET.get('q')
         object_list = Book.objects.filter(title__icontains=query)
         return object_list
+
+
+class BookDetailView(DetailView, FormMixin, SuccessMessageMixin):
+    model = Book
+    template_name = 'book.html'
+    context_object_name = 'get_book'
+    form_class = CommentForm
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid:
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.owner_comment = self.request.user
+        self.object.book = self.get_object()
+        self.object.save()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('book_detail', kwargs={'pk': self.get_object().id})

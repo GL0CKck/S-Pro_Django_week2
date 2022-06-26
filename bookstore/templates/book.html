@@ -1,10 +1,28 @@
 {% extends 'home/base.html' %}
 {% block content %}
 <div  class="media-body" >
-<p class="text-right  font-weight-bold"> Название книги - {{ book.title }} </p>
-<p class="text-right  font-italic" >  Автор- {{ book.author }}</p>
-<p class="text-right  font-italic" >  Дата выпуска- {{ book.release_data }}</p>
-<p class="text-right  font-italic" > Описание - {{ book.description }}</p>
-        <a href="{% url 'book_list' %}">Home</a>
+<p class="text-right  font-weight-bold"> Название книги - {{ get_book.title }} </p>
+<p class="text-right  font-italic" >  Автор- {{ get_book.author }}</p>
+<p class="text-right  font-italic" >  Дата выпуска- {{ get_book.release_data }}</p>
+<p class="text-right  font-italic" > Описание - {{ get_book.description }}</p>
+{% for comment in get_book.my_comment.all %}
+
+    <h3>{{ comment.content }} </h3>
+    <p>Date: {{ comment.date_create }}</p>
+    <h5>By: {{ comment.owner_comment }}</h5>
+{% endfor %}
+    {% if user.is_authenticated %}
+        <form  method="POST">
+        {% csrf_token %}
+        {{ form }}
+       <button type="submit" class="btn btn-success">Send</button>
+
+        </form>
+        {% else %}
+        <h4> Рецензию могут оставлять только зарегестрированые пользователи</h4>
+        <h4><a class="mb-1" href="{% url 'registration' %}">Registration</a> или
+            <a class="mb-1" href="{% url 'login' %}">Login</a></h4>
+        {% endif %}
+    <a href="{% url 'book_list' %}">Home</a>
   </div>
 {% endblock %}
