@@ -1,13 +1,16 @@
 from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView, DetailView
-from django.shortcuts import get_object_or_404
+from django.views.generic import ListView, DetailView
 from django.views.generic.edit import FormMixin
+from django.utils import timezone
+from rest_framework.views import APIView
 
 from .forms import BookForm, AuthorForm, CommentForm
-from .models import Author, Book
-
+from .models import Book, Store
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .serializers import CreateStore
 
 def create_book(request):
     if request.method == 'POST':
@@ -75,3 +78,49 @@ class BookDetailView(DetailView, FormMixin, SuccessMessageMixin):
 
     def get_success_url(self):
         return reverse_lazy('book_detail', kwargs={'pk': self.get_object().id})
+
+
+@api_view(['GET'])
+def show_date(request):
+    return Response({'Date:': timezone.now().date(),
+                     'Year:': timezone.now().year,
+                     'Month:': timezone.now().month,
+                     'Day:': timezone.now().day})
+
+
+@api_view(['GET'])
+def hello_world(request):
+    return Response({'msg': 'Hello Django REST!!'})
+
+
+@api_view(['GET'])
+def my_name(request, name):
+    return Response({'Name': name})
+
+
+@api_view(['POST'])
+def calculate(request, num1, act, num2):
+    if request.method == 'POST':
+        action = {'plus': '+', 'minus': '-', 'mylti': '*', 'devide': '/'}
+        if num2 != 0:
+            raise ZeroDivisionError('Try divide on 0')
+        if act in action:
+            return Response({'num1 ': num1, 'action: ': action.get(act), 'num2: ': num2,
+                             'result:': eval(num1 + action.get(act) + num2)})
+        else:
+            return Response('Your action not it our action')
+
+
+class GetorCreateStore(APIView):
+    serializer_class = CreateStore
+
+    def get(self, request):
+        store = Store.objects.all()
+        serializer = CreateStore(store, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)

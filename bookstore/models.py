@@ -24,3 +24,9 @@ class CommentUsers(models.Model):
     owner_comment = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     date_create = models.DateTimeField(auto_now_add=True)
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='my_comment')
+
+
+class Store(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField(max_length=800)
+    rating = models.IntegerField(default=0, blank=True, null=True)
