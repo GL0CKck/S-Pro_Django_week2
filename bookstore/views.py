@@ -10,7 +10,8 @@ from .forms import BookForm, AuthorForm, CommentForm
 from .models import Book, Store
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .serializers import CreateStore
+from .serializers import CreateStoreSerializer
+
 
 def create_book(request):
     if request.method == 'POST':
@@ -103,7 +104,7 @@ def calculate(request, num1, act, num2):
     if request.method == 'POST':
         action = {'plus': '+', 'minus': '-', 'mylti': '*', 'devide': '/'}
         if num2 != 0:
-            raise ZeroDivisionError('Try divide on 0')
+            return Response(['ZeroDivision'], status=500)
         if act in action:
             return Response({'num1 ': num1, 'action: ': action.get(act), 'num2: ': num2,
                              'result:': eval(num1 + action.get(act) + num2)})
@@ -112,11 +113,11 @@ def calculate(request, num1, act, num2):
 
 
 class GetorCreateStore(APIView):
-    serializer_class = CreateStore
+    serializer_class = CreateStoreSerializer
 
     def get(self, request):
         store = Store.objects.all()
-        serializer = CreateStore(store, many=True)
+        serializer = CreateStoreSerializer(store, many=True)
         return Response(serializer.data)
 
     def post(self, request):
